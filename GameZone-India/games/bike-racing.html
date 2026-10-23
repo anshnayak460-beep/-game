@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bike Racing | GameZone India</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#101522;color:white;
+  font-family:Arial,sans-serif;text-align:center
+}
+header{padding:15px;background:#182238}
+header a{color:#65f0b0;text-decoration:none}
+h1{margin:8px;font-size:25px}
+.game{max-width:480px;margin:auto;padding:12px}
+.stats{display:flex;justify-content:space-around;margin:12px 0}
+canvas{
+  display:block;width:100%;max-width:400px;height:auto;
+  margin:auto;background:#333;border:3px solid #65718b;
+  border-radius:10px
+}
+button{
+  border:0;border-radius:12px;padding:13px 18px;
+  font-weight:bold;font-size:16px;cursor:pointer;
+  background:#65f0b0;color:#102018;margin:5px
+}
+.controls{display:flex;justify-content:center;gap:25px;margin-top:12px}
+.controls button{font-size:25px;min-width:90px}
+.note{color:#c2cbe0;font-size:14px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <a href="../index.html">← GameZone India Home</a>
+  <h1>🏍️ Bike Racing</h1>
+</header>
+
+<div class="game">
+  <div class="stats">
+    <div>🏆 Score: <b id="score">0</b></div>
+    <div>⭐ Best: <b id="best">0</b></div>
+  </div>
+
+  <canvas id="game" width="360" height="560"></canvas>
+
+  <div>
+    <button id="start">▶ Start Game</button>
+    <button id="pause">⏸ Pause</button>
+    <button id="restart">↻ Restart</button>
+  </div>
+
+  <div class="controls">
+    <button id="left">⬅️</button>
+    <button id="right">➡️</button>
+  </div>
+
+  <p class="note">
+    Mobile: Use the arrow buttons.<br>
+    Computer: Use ← and → keys.<br>
+    Dodge traffic and score points!
+  </p>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const scoreText = document.getElementById("score");
+const bestText = document.getElementById("best");
+
+const lanes = [85, 180, 275];
+let bike, traffic, score, best, running, paused, gameOver;
+let frame = 0;
+let animationId = null;
+
+best = Number(localStorage.getItem("bikeRacingBest") || 0);
+bestText.textContent = best;
+
+function resetGame(){
+  bike = {lane:1, x:180, y:445, width:30, height:58};
+  traffic = [];
+  score = 0;
+  frame = 0;
+  running = false;
+  paused = false;
+  gameOver = false;
+  scoreText.textContent = score;
+  draw();
+}
+
+function roundedRect(x,y,w,h,r,color){
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,r);
+  ctx.fill();
+}
+
+function drawBike(x,y,color){
+  // Wheels
+  roundedRect(x-10,y+7,20,16,6,"#101010");
+  roundedRect(x-10,y+37,20,16,6,"#101010");
+
+  // Bike body
+  roundedRect(x-8,y+12,16,32,6,color);
+  roundedRect(x-5,y+17,10,11,3,"#d9f5ff");
+
+  // Rider helmet
+  ctx.fillStyle="#ffdc9b";
+  ctx.beginPath();
+  ctx.arc(x,y+27,7,0,Math.PI*2);
+  ctx.fill();
+
+  // Handlebar
+  ctx.strokeStyle="#eeeeee";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(x-13,y+12);
+  ctx.lineTo(x+13,y+12);
+  ctx.stroke();
+}
+
+function drawCar(car){
+  roundedRect(car.x-17,car.y,34,56,7,car.color);
+  roundedRect(car.x-12,car.y+8,24,15,4,"#b9e8ff");
+  roundedRect(car.x-12,car.y+34,24,10,3,"#242b36");
+
+  ctx.fillStyle="#ffe58a";
+  ctx.fillRect(car.x-14,car.y+2,7,4);
+  ctx.fillRect(car.x+7,car.y+2,7,4);
+}
+
+function draw(){
+  // Grass
+  ctx.fillStyle="#277347";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Road
+  ctx.fillStyle="#424650";
+  ctx.fillRect(30,0,300,canvas.height);
+
+  // Road borders
+  ctx.fillStyle="#f4f4f4";
+  ctx.fillRect(30,0,5,canvas.height);
+  ctx.fillRect(325,0,5,canvas.height);
+
+  // Lane markings
+  ctx.fillStyle="#f6f0bc";
+  for(let y=-40+(frame*5)%80;y<canvas.height;y+=80){
+    ctx.fillRect(130,y,4,42);
+    ctx.fillRect(225,y,4,42);
+  }
+
+  // Traffic
+  traffic.forEach(drawCar);
+
+  // Player bike
+  drawBike(bike.x,bike.y,"#ff405b");
+
+  if(!running){
+    ctx.fillStyle="rgba(0,0,0,.66)";
+    ctx.fillRect(35,210,290,105);
+    ctx.textAlign="center";
+    ctx.fillStyle="white";
+    ctx.font="bold 24px Arial";
+    ctx.fillText(gameOver ? "GAME OVER!" : "BIKE RACING",180,250);
+    ctx.font="16px Arial";
+    ctx.fillText(
+      gameOver ? "Tap Restart to play again" :
+      paused ? "Game Paused" : "Tap Start to ride!",
+      180,282
+    );
+  }
+}
+
+function endGame(){
+  running = false;
+  gameOver = true;
+  if(score > best){
+    best = score;
+    localStorage.setItem("bikeRacingBest",best);
+    bestText.textContent = best;
+  }
+  draw();
+}
+
+function update(){
+  if(!running || paused) return;
+
+  frame++;
+
+  // Spawn traffic
+  if(frame % 48 === 0){
+    const lane = Math.floor(Math.random()*3);
+    traffic.push({
+      lane:lane,
+      x:lanes[lane],
+      y:-65,
+      color:["#ffc247","#4aa8ff","#c084fc","#e9edf5"][
+        Math.floor(Math.random()*4)
+      ]
+    });
+  }
+
+  const speed = 4 + Math.min(score/250,4);
+
+  traffic.forEach(car=>{
+    car.y += speed;
+
+    // Collision detection
+    const closeX = Math.abs(car.x-bike.x) < 31;
+    const closeY = car.y+56 > bike.y+8 && car.y < bike.y+52;
+
+    if(closeX && closeY){
+      endGame();
+    }
+
+    if(car.y > canvas.height){
+      car.passed = true;
+      score += 10;
+      scoreText.textContent = score;
+    }
+  });
+
+  traffic = traffic.filter(car=>car.y < canvas.height+70);
+
+  if(running){
+    draw();
+    animationId = requestAnimationFrame(update);
+  }
+}
+
+function startGame(){
+  if(gameOver) resetGame();
+  if(running) return;
+
+  running = true;
+  paused = false;
+  draw();
+  animationId = requestAnimationFrame(update);
+}
+
+function moveBike(direction){
+  if(!bike || gameOver) return;
+  bike.lane = Math.max(0,Math.min(2,bike.lane+direction));
+  bike.x = lanes[bike.lane];
+  draw();
+}
+
+document.getElementById("start").addEventListener("click",startGame);
+
+document.getElementById("pause").addEventListener("click",()=>{
+  if(!running) return;
+  running = false;
+  paused = true;
+  draw();
+});
+
+document.getElementById("restart").addEventListener("click",()=>{
+  resetGame();
+  startGame();
+});
+
+document.getElementById("left").addEventListener("click",()=>moveBike(-1));
+document.getElementById("right").addEventListener("click",()=>moveBike(1));
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft") moveBike(-1);
+  if(e.key==="ArrowRight") moveBike(1);
+  if(e.key===" "){
+    e.preventDefault();
+    if(running){
+      running = false;
+      paused = true;
+      draw();
+    }else{
+      startGame();
+    }
+  }
+});
+
+resetGame();
+</script>
+</body>
+    </html>
