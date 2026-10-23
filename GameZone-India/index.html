@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>GameZone India - Play Free Online Games</title>
+<meta name="description" content="Play free online arcade, racing, puzzle and sports games on GameZone India.">
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<header class="topbar">
+    <a class="logo" href="index.html">
+        <span class="logo-icon">🎮</span>
+        GameZone<span class="india">India</span>
+    </a>
+
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+
+    <nav id="navigation">
+        <a href="#home">Home</a>
+        <a href="#popular">Popular</a>
+        <a href="#categories">Categories</a>
+    </nav>
+</header>
+
+<main id="home">
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="badge">🎉 100% FREE TO PLAY</span>
+            <h1>Play Games.<br><span>Have Fun!</span></h1>
+            <p>Discover amazing free browser games. No downloads, just play!</p>
+
+            <div class="search-box">
+                <span>🔍</span>
+                <input id="searchInput" type="search"
+                       placeholder="Search your favourite game..."
+                       aria-label="Search games">
+                <button id="searchBtn">Search</button>
+            </div>
+
+            <div class="hero-tags">
+                <span>🏎️ Racing</span>
+                <span>🧩 Puzzle</span>
+                <span>⚡ Arcade</span>
+            </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+            <div class="floating-card card-one">🏎️</div>
+            <div class="floating-card card-two">👾</div>
+            <div class="floating-card card-three">🚀</div>
+            <div class="hero-circle">🎮</div>
+            <div class="hero-star star-one">✦</div>
+            <div class="hero-star star-two">✦</div>
+        </div>
+    </section>
+
+    <section class="category-section" id="categories">
+        <div class="section-heading">
+            <div>
+                <h2>Explore Categories</h2>
+                <p>Choose your favourite type of game</p>
+            </div>
+        </div>
+
+        <div class="categories">
+            <button class="category active" data-category="all">
+                <span>🎮</span> All Games
+            </button>
+            <button class="category" data-category="arcade">
+                <span>👾</span> Arcade
+            </button>
+            <button class="category" data-category="racing">
+                <span>🏎️</span> Racing
+            </button>
+            <button class="category" data-category="puzzle">
+                <span>🧩</span> Puzzle
+            </button>
+            <button class="category" data-category="sports">
+                <span>🏀</span> Sports
+            </button>
+            <button class="category" data-category="action">
+                <span>🚀</span> Action
+            </button>
+        </div>
+    </section>
+
+    <section class="games-section" id="popular">
+        <div class="section-heading">
+            <div>
+                <h2>🔥 Popular Games</h2>
+                <p>Pick a game and start playing!</p>
+            </div>
+            <span class="game-count" id="gameCount">15 Games</span>
+        </div>
+
+        <div class="games-grid" id="gamesGrid"></div>
+
+        <div class="no-results" id="noResults" hidden>
+            <span>🔎</span>
+            <h3>No games found</h3>
+            <p>Try another name or category.</p>
+            <button id="resetBtn">Show All Games</button>
+        </div>
+    </section>
+
+    <section class="info-banner">
+        <div class="info-icon">🕹️</div>
+        <div>
+            <h2>Your Gaming Adventure Starts Here!</h2>
+            <p>Enjoy fun games on your phone, tablet or computer.</p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <a class="logo footer-logo" href="#home">🎮 GameZone India</a>
+    <p>Free games. Big fun. Anytime, anywhere.</p>
+    <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </div>
+    <p class="copyright">© <span id="year"></span> GameZone India</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+  </html>
